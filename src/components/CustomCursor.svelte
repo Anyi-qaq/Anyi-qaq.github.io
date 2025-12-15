@@ -1,43 +1,43 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+import { onDestroy, onMount } from "svelte";
 
-  let cursorX = 0;
-  let cursorY = 0;
-  let cursorVisible = false;
+let cursorX = 0;
+let cursorY = 0;
+let cursorVisible = false;
 
-  // Track mouse movement
-  function updateCursorPosition(e) {
-    cursorX = e.clientX;
-    cursorY = e.clientY;
-    cursorVisible = true;
-  }
+// Track mouse movement
+function updateCursorPosition(e) {
+	cursorX = e.clientX;
+	cursorY = e.clientY;
+	cursorVisible = true;
+}
 
-  // Handle cursor leaving the window
-  function handleMouseLeave() {
-    cursorVisible = false;
-  }
+// Handle cursor leaving the window
+function handleMouseLeave() {
+	cursorVisible = false;
+}
 
-  function handleMouseEnter() {
-    cursorVisible = true;
-  }
+function handleMouseEnter() {
+	cursorVisible = true;
+}
 
-  onMount(() => {
-    window.addEventListener('mousemove', updateCursorPosition);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', handleMouseEnter);
-    
-    // Hide default cursor globally
-    document.documentElement.style.cursor = 'none';
-  });
+onMount(() => {
+	window.addEventListener("mousemove", updateCursorPosition);
+	document.addEventListener("mouseleave", handleMouseLeave);
+	document.addEventListener("mouseenter", handleMouseEnter);
 
-  onDestroy(() => {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('mousemove', updateCursorPosition);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseenter', handleMouseEnter);
-      document.documentElement.style.cursor = '';
-    }
-  });
+	// Hide default cursor globally
+	document.documentElement.style.cursor = "none";
+});
+
+onDestroy(() => {
+	if (typeof window !== "undefined") {
+		window.removeEventListener("mousemove", updateCursorPosition);
+		document.removeEventListener("mouseleave", handleMouseLeave);
+		document.removeEventListener("mouseenter", handleMouseEnter);
+		document.documentElement.style.cursor = "";
+	}
+});
 </script>
 
 <div 
