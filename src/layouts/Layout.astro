@@ -5,8 +5,9 @@ import "@fontsource/roboto/700.css";
 
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import CustomCursor from "@components/CustomCursor.svelte";
+import MusicPlayer from "@components/MusicPlayer.svelte";
 import StarrySky from "@components/StarrySky.svelte";
-import { profileConfig, siteConfig } from "@/config";
+import { musicPlayerConfig, profileConfig, siteConfig } from "@/config";
 import {
 	AUTO_MODE,
 	BANNER_HEIGHT,
@@ -156,6 +157,14 @@ const bannerOffset =
 		<ConfigCarrier></ConfigCarrier>
 		<StarrySky client:load />
 		<CustomCursor client:load />
+		{musicPlayerConfig.enable && (
+			<MusicPlayer
+				client:load
+				playlistId={musicPlayerConfig.playlistId}
+				autoplay={musicPlayerConfig.autoplay}
+				volume={musicPlayerConfig.volume}
+			/>
+		)}
 		<slot />
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->

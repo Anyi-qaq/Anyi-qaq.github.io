@@ -1,6 +1,7 @@
 import type {
 	ExpressiveCodeConfig,
 	LicenseConfig,
+	MusicPlayerConfig,
 	NavBarConfig,
 	ProfileConfig,
 	SiteConfig,
@@ -87,4 +88,11 @@ export const expressiveCodeConfig: ExpressiveCodeConfig = {
 	// Note: Some styles (such as background color) are being overridden, see the astro.config.mjs file.
 	// Please select a dark theme, as this blog theme currently only supports dark background color
 	theme: "github-dark",
+};
+
+export const musicPlayerConfig: MusicPlayerConfig = {
+	enable: true,
+	playlistId: "3778678", // 网易云歌单 ID，可自定义
+	autoplay: false,
+	volume: 0.5,
 };
