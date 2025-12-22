@@ -421,6 +421,8 @@ function getPlayModeTitle(): string {
 						<div
 							class="volume-slider-container"
 							onmouseleave={() => (showVolumeSlider = false)}
+							role="group"
+							aria-label="音量控制"
 						>
 							<input
 								type="range"
