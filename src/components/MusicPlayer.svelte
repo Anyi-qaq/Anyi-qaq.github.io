@@ -499,14 +499,14 @@ function getPlayModeTitle(): string {
 		width: 56px;
 		height: 56px;
 		border-radius: 50%;
-		background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9));
+		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.65 0.16 calc(var(--hue) + 30)));
 		backdrop-filter: blur(10px);
-		border: 2px solid rgba(255, 255, 255, 0.2);
+		border: 2px solid oklch(1 0 0 / 0.2);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+		box-shadow: 0 4px 20px oklch(0.5 0.15 var(--hue) / 0.4);
 		transition: all 0.3s ease;
 		position: relative;
 		overflow: hidden;
@@ -514,7 +514,7 @@ function getPlayModeTitle(): string {
 
 	.player-minimized:hover {
 		transform: scale(1.1);
-		box-shadow: 0 6px 30px rgba(99, 102, 241, 0.6);
+		box-shadow: 0 6px 30px oklch(0.5 0.15 var(--hue) / 0.6);
 	}
 
 	.mini-cover {
@@ -588,14 +588,14 @@ function getPlayModeTitle(): string {
 		width: 320px;
 		background: linear-gradient(
 			145deg,
-			rgba(30, 30, 45, 0.95),
-			rgba(20, 20, 35, 0.98)
+			oklch(0.22 0.02 var(--hue) / 0.95),
+			oklch(0.18 0.015 var(--hue) / 0.98)
 		);
 		backdrop-filter: blur(20px);
 		border-radius: 20px;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
-			0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+		border: 1px solid oklch(1 0 0 / 0.1);
+		box-shadow: 0 10px 40px oklch(0 0 0 / 0.5),
+			0 0 0 1px oklch(1 0 0 / 0.05) inset;
 		overflow: hidden;
 		animation: slideUp 0.3s ease;
 	}
@@ -713,11 +713,11 @@ function getPlayModeTitle(): string {
 	}
 
 	.settings-input:focus {
-		border-color: #667eea;
+		border-color: oklch(0.65 0.14 var(--hue));
 	}
 
 	.settings-btn {
-		background: #667eea;
+		background: oklch(0.55 0.14 var(--hue));
 		color: white;
 		border: none;
 		border-radius: 6px;
@@ -729,7 +729,7 @@ function getPlayModeTitle(): string {
 	}
 
 	.settings-btn:hover {
-		background: #7c8ff8;
+		background: oklch(0.62 0.14 var(--hue));
 	}
 
 	.settings-hint {
@@ -749,20 +749,20 @@ function getPlayModeTitle(): string {
 		height: 160px;
 		border-radius: 50%;
 		object-fit: cover;
-		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-		border: 4px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 8px 30px oklch(0 0 0 / 0.4);
+		border: 4px solid oklch(0.55 0.14 var(--hue) / 0.3);
 	}
 
 	.cover-placeholder {
 		width: 160px;
 		height: 160px;
 		border-radius: 50%;
-		background: linear-gradient(135deg, #667eea, #764ba2);
+		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-size: 60px;
-		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 8px 30px oklch(0 0 0 / 0.4);
 	}
 
 	.track-info {
@@ -814,7 +814,7 @@ function getPlayModeTitle(): string {
 
 	.progress-fill {
 		height: 100%;
-		background: linear-gradient(90deg, #667eea, #764ba2);
+		background: linear-gradient(90deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
 		border-radius: 3px;
 		transition: width 0.1s linear;
 	}
@@ -855,13 +855,13 @@ function getPlayModeTitle(): string {
 	.play-btn {
 		width: 52px;
 		height: 52px;
-		background: linear-gradient(135deg, #667eea, #764ba2);
+		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
 		font-size: 20px;
 	}
 
 	.play-btn:hover:not(:disabled) {
-		background: linear-gradient(135deg, #7c8ff8, #8e5cbf);
-		box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+		background: linear-gradient(135deg, oklch(0.62 0.14 var(--hue)), oklch(0.57 0.16 calc(var(--hue) + 30)));
+		box-shadow: 0 4px 20px oklch(0.5 0.15 var(--hue) / 0.4);
 	}
 
 	.mode-btn {
@@ -901,7 +901,7 @@ function getPlayModeTitle(): string {
 		width: 14px;
 		height: 14px;
 		border-radius: 50%;
-		background: linear-gradient(135deg, #667eea, #764ba2);
+		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
 		cursor: pointer;
 	}
 
@@ -931,17 +931,17 @@ function getPlayModeTitle(): string {
 	}
 
 	.track-item.active {
-		background: rgba(102, 126, 234, 0.2);
+		background: oklch(0.55 0.14 var(--hue) / 0.2);
 	}
 
 	.track-index {
-		color: rgba(255, 255, 255, 0.3);
+		color: oklch(1 0 0 / 0.3);
 		font-size: 12px;
 		min-width: 20px;
 	}
 
 	.track-item.active .track-index {
-		color: #667eea;
+		color: oklch(0.65 0.14 var(--hue));
 	}
 
 	.track-item-name {
