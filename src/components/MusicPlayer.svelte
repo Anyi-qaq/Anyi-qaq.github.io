@@ -1,5 +1,7 @@
 <script lang="ts">
+import Icon from "@iconify/svelte";
 import { onMount } from "svelte";
+import { fade, fly, slide } from "svelte/transition";
 
 // Props
 interface Props {
@@ -24,7 +26,6 @@ let currentVolume = $state(volume);
 let isMuted = $state(false);
 let currentTrackIndex = $state(0);
 let playMode = $state<"order" | "random" | "loop">("order");
-let showVolumeSlider = $state(false);
 let isSettingsOpen = $state(false);
 let isListExpanded = $state(false);
 let inputPlaylistId = $state(playlistId);
@@ -228,11 +229,11 @@ $effect(() => {
 function getPlayModeIcon(): string {
 	switch (playMode) {
 		case "random":
-			return "🔀";
+			return "material-symbols:shuffle";
 		case "loop":
-			return "🔂";
+			return "material-symbols:repeat-one";
 		default:
-			return "🔁";
+			return "material-symbols:repeat";
 	}
 }
 
@@ -247,7 +248,28 @@ function getPlayModeTitle(): string {
 			return "顺序播放";
 	}
 }
+
+// Keyboard Controls
+function handleKeydown(event: KeyboardEvent) {
+	if (!isExpanded) return;
+	switch (event.key) {
+		case " ":
+			event.preventDefault();
+			togglePlay();
+			break;
+		case "ArrowLeft":
+			event.preventDefault();
+			prevTrack();
+			break;
+		case "ArrowRight":
+			event.preventDefault();
+			nextTrack();
+			break;
+	}
+}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <!-- Audio Element -->
 <audio
@@ -261,202 +283,216 @@ function getPlayModeTitle(): string {
 ></audio>
 
 <!-- Music Player Container -->
-<div
-	class="music-player"
-	class:expanded={isExpanded}
-	role="region"
-	aria-label="音乐播放器"
->
+<div class="fixed bottom-4 right-4 z-[100] font-sans">
 	{#if isExpanded}
 		<!-- Expanded View -->
-		<div class="player-expanded">
+		<div
+            class="float-panel w-80 p-4 transition-all duration-300"
+            role="region"
+            aria-label="音乐播放器"
+            transition:fly={{ y: 20, duration: 300 }}
+        >
 			<!-- Header -->
-			<div class="player-header">
-				<span class="player-title">🎵 音乐播放器</span>
-				<div class="header-btns">
+			<div class="flex items-center justify-between mb-4">
+				<div class="flex items-center gap-2 text-[var(--primary)] font-bold">
+                    <span class="text-xl">🎵</span>
+                    <span>音乐播放器</span>
+                </div>
+				<div class="flex items-center gap-1">
 					<button
 						type="button"
-						class="header-icon-btn"
+						class="btn-plain w-8 h-8 rounded-md flex items-center justify-center p-0"
 						onclick={() => (isSettingsOpen = !isSettingsOpen)}
+                        class:text-[var(--primary)]={isSettingsOpen}
 						title="设置"
 						aria-label="设置"
 					>
-						⚙️
+						<Icon icon="material-symbols:settings-outline" class="text-xl" />
 					</button>
 					<button
 						type="button"
-						class="minimize-btn"
+						class="btn-plain w-8 h-8 rounded-md flex items-center justify-center p-0"
 						onclick={() => (isExpanded = false)}
 						aria-label="最小化"
 					>
-						−
+						<Icon icon="material-symbols:remove" class="text-xl" />
 					</button>
 				</div>
 			</div>
 
 			{#if isSettingsOpen}
-				<div class="settings-panel">
-					<div class="settings-title">设置歌单码</div>
-					<div class="settings-input-group">
+				<div class="mb-4 bg-[var(--card-bg)] rounded-xl p-3 border border-black/5 dark:border-white/5" transition:slide>
+					<div class="text-sm font-bold mb-2 text-black/90 dark:text-white/90">设置歌单码</div>
+					<div class="flex gap-2">
 						<input
 							type="text"
 							bind:value={inputPlaylistId}
 							placeholder="输入网易云歌单ID"
-							class="settings-input"
+							class="flex-1 bg-[var(--page-bg)] border border-black/5 dark:border-white/5 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-[var(--primary)] transition-colors"
 						/>
 						<button
 							type="button"
-							class="settings-btn"
+							class="btn-regular rounded-lg px-3 py-1.5 text-sm font-bold"
 							onclick={updatePlaylistId}
 						>
 							保存
 						</button>
 					</div>
-					<div class="settings-hint">输入 ID 后点击保存将重新加载歌单</div>
+					<div class="text-xs text-black/40 dark:text-white/40 mt-2">输入 ID 后点击保存将重新加载歌单</div>
 				</div>
 			{/if}
 
 			<!-- Cover Art -->
-			<div class="cover-container">
+			<div class="flex justify-center mb-6 relative">
+                <div class="w-32 h-32 rounded-full overflow-hidden shadow-lg border-4 border-[var(--card-bg)] relative z-10 transition-transform duration-[8s] ease-linear" class:animate-spin-slow={isPlaying}>
 				{#if currentTrack?.pic}
 					<img
 						src={currentTrack.pic}
 						alt={currentTrack.name}
-						class="cover-art"
-						class:spinning={isPlaying}
+						class="w-full h-full object-cover"
 					/>
 				{:else}
-					<div class="cover-placeholder" class:spinning={isPlaying}>🎵</div>
+					<div class="w-full h-full flex items-center justify-center bg-[var(--page-bg)] text-4xl text-black/20 dark:text-white/20">🎵</div>
 				{/if}
+                </div>
+                <!-- Glow effect behind cover -->
+                <div class="absolute inset-0 bg-[var(--primary)] opacity-20 blur-3xl transform scale-150 -z-0 rounded-full"></div>
 			</div>
 
 			<!-- Track Info -->
-			<div class="track-info">
+			<div class="text-center mb-6">
 				{#if isLoading}
-					<div class="track-name">加载中...</div>
-					<div class="track-artist">请稍候</div>
+					<div class="text-lg font-bold text-black/90 dark:text-white/90 mb-1">加载中...</div>
+					<div class="text-sm text-black/50 dark:text-white/50">请稍候</div>
 				{:else if currentTrack}
-					<div class="track-name" title={currentTrack.name}>
+					<div class="text-lg font-bold text-black/90 dark:text-white/90 mb-1 truncate px-4" title={currentTrack.name}>
 						{currentTrack.name}
 					</div>
-					<div class="track-artist" title={currentTrack.artist}>
+					<div class="text-sm text-black/50 dark:text-white/50 truncate px-4" title={currentTrack.artist}>
 						{currentTrack.artist}
 					</div>
 				{:else}
-					<div class="track-name">暂无歌曲</div>
-					<div class="track-artist">请检查歌单</div>
+					<div class="text-lg font-bold text-black/90 dark:text-white/90 mb-1">暂无歌曲</div>
+					<div class="text-sm text-black/50 dark:text-white/50">请检查歌单</div>
 				{/if}
 			</div>
 
 			<!-- Progress Bar -->
-			<div class="progress-container">
-				<span class="time-display">{formatTime(currentTime)}</span>
-				<button
-					type="button"
-					class="progress-bar"
+			<div class="flex items-center gap-3 mb-6 px-2">
+				<span class="text-xs text-black/40 dark:text-white/40 min-w-[32px] text-right">{formatTime(currentTime)}</span>
+				<div
+					class="flex-1 h-1.5 bg-black/5 dark:bg-white/10 rounded-full cursor-pointer relative group"
 					onclick={handleSeek}
-					aria-label="进度条"
+                    onkeydown={() => {}}
+                    role="slider"
+                    aria-valuenow={progress}
+                    tabindex="0"
 				>
-					<div class="progress-fill" style="width: {progress}%"></div>
-				</button>
-				<span class="time-display">{formatTime(duration)}</span>
+					<div class="absolute top-0 left-0 h-full bg-[var(--primary)] rounded-full transition-all duration-100" style="width: {progress}%">
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-[var(--primary)] rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"></div>
+                    </div>
+				</div>
+				<span class="text-xs text-black/40 dark:text-white/40 min-w-[32px]">{formatTime(duration)}</span>
 			</div>
 
 			<!-- Controls -->
-			<div class="controls">
+			<div class="flex items-center justify-center gap-4 mb-4">
 				<button
 					type="button"
-					class="control-btn mode-btn"
+					class="btn-plain w-10 h-10 rounded-full hover:text-[var(--primary)] flex items-center justify-center p-0"
 					onclick={togglePlayMode}
 					title={getPlayModeTitle()}
 				>
-					{getPlayModeIcon()}
+                    <Icon icon={getPlayModeIcon()} class="text-2xl" />
 				</button>
 				<button
 					type="button"
-					class="control-btn"
+					class="btn-plain w-10 h-10 rounded-full hover:text-[var(--primary)] flex items-center justify-center p-0"
 					onclick={prevTrack}
 					aria-label="上一首"
 				>
-					⏮
+					<Icon icon="material-symbols:skip-previous" class="text-3xl" />
 				</button>
 				<button
 					type="button"
-					class="control-btn play-btn"
+					class="flex items-center justify-center w-14 h-14 bg-[var(--primary)] text-white rounded-full shadow-lg shadow-[var(--primary)]/30 hover:shadow-[var(--primary)]/50 hover:scale-105 active:scale-95 transition-all p-0"
 					onclick={togglePlay}
 					disabled={isLoading || !currentTrack}
 					aria-label={isPlaying ? "暂停" : "播放"}
 				>
 					{#if isPlaying}
-						⏸
+                        <Icon icon="material-symbols:pause" class="text-4xl" />
 					{:else}
-						▶
+                        <Icon icon="material-symbols:play-arrow" class="text-4xl" />
 					{/if}
 				</button>
 				<button
 					type="button"
-					class="control-btn"
+					class="btn-plain w-10 h-10 rounded-full hover:text-[var(--primary)] flex items-center justify-center p-0"
 					onclick={nextTrack}
 					aria-label="下一首"
 				>
-					⏭
+					<Icon icon="material-symbols:skip-next" class="text-3xl" />
 				</button>
-				<div class="volume-container">
-					<button
-						type="button"
-						class="control-btn"
-						onclick={toggleMute}
-						onmouseenter={() => (showVolumeSlider = true)}
-						aria-label={isMuted ? "取消静音" : "静音"}
-					>
-						{#if isMuted || currentVolume === 0}
-							🔇
-						{:else if currentVolume < 0.5}
-							🔉
-						{:else}
-							🔊
-						{/if}
-					</button>
-					{#if showVolumeSlider}
-						<div
-							class="volume-slider-container"
-							onmouseleave={() => (showVolumeSlider = false)}
-							role="group"
-							aria-label="音量控制"
-						>
-							<input
-								type="range"
-								min="0"
-								max="1"
-								step="0.01"
-								value={currentVolume}
-								oninput={handleVolumeChange}
-								class="volume-slider"
-							/>
-						</div>
-					{/if}
-				</div>
+                <div class="relative group">
+                    <button
+                        type="button"
+                        class="btn-plain w-10 h-10 rounded-full hover:text-[var(--primary)] flex items-center justify-center p-0"
+                        onclick={toggleMute}
+                        aria-label={isMuted ? "取消静音" : "静音"}
+                    >
+                        {#if isMuted || currentVolume === 0}
+                            <Icon icon="material-symbols:volume-off" class="text-2xl" />
+                        {:else if currentVolume < 0.5}
+                            <Icon icon="material-symbols:volume-down" class="text-2xl" />
+                        {:else}
+                            <Icon icon="material-symbols:volume-up" class="text-2xl" />
+                        {/if}
+                    </button>
+                    <!-- Volume Slider Popup -->
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-8 h-24 bg-[var(--card-bg)] rounded-full shadow-lg border border-black/5 dark:border-white/5 flex items-end justify-center py-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={currentVolume}
+                            oninput={handleVolumeChange}
+                            class="volume-slider absolute appearance-none w-16 h-1 bg-transparent rotate-[-90deg] origin-center cursor-pointer"
+                        />
+                         <!-- Custom track for slider vertical -->
+                         <div class="w-1 h-16 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden relative pointer-events-none">
+                             <div class="absolute bottom-0 left-0 w-full bg-[var(--primary)]" style="height: {currentVolume * 100}%"></div>
+                         </div>
+                    </div>
+                </div>
 			</div>
 
-			<div class="track-list">
-				{#each (isListExpanded ? tracks : tracks.slice(0, 5)) as track, index}
+			<div class="max-h-40 overflow-y-auto no-scrollbar scroll-smooth">
+				{#each (isListExpanded ? tracks : tracks.slice(0, 3)) as track, index}
 					<button
 						type="button"
-						class="track-item"
-						class:active={index === currentTrackIndex}
+						class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left group"
+						class:text-[var(--primary)]={index === currentTrackIndex}
 						onclick={() => (currentTrackIndex = index)}
 					>
-						<span class="track-index">{index + 1}</span>
-						<span class="track-item-name">{track.name}</span>
+						<span class="text-xs opacity-50 font-mono w-4">{index + 1}</span>
+						<div class="flex-1 min-w-0">
+                            <div class="text-sm font-medium truncate {index === currentTrackIndex ? 'text-[var(--primary)]' : 'text-black/80 dark:text-white/80'}">{track.name}</div>
+                            <div class="text-xs opacity-50 truncate">{track.artist}</div>
+                        </div>
+                        {#if index === currentTrackIndex && isPlaying}
+                            <Icon icon="material-symbols:equalizer" class="text-lg animate-pulse" />
+                        {/if}
 					</button>
 				{/each}
-				{#if tracks.length > 5}
+				{#if tracks.length > 3}
 					<button
 						type="button"
-						class="track-more-btn"
+						class="w-full text-center text-xs text-black/40 dark:text-white/40 py-2 hover:text-[var(--primary)] transition-colors"
 						onclick={() => (isListExpanded = !isListExpanded)}
 					>
-						{isListExpanded ? "收起列表" : `还有 ${tracks.length - 5} 首...`}
+						{isListExpanded ? "收起列表" : `还有 ${tracks.length - 3} 首...`}
 					</button>
 				{/if}
 			</div>
@@ -465,540 +501,50 @@ function getPlayModeTitle(): string {
 		<!-- Minimized View -->
 		<button
 			type="button"
-			class="player-minimized"
+			class="relative w-14 h-14 rounded-full bg-[var(--card-bg)] shadow-[var(--card-shadow)] flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300 group border border-black/5 dark:border-white/5"
 			onclick={() => (isExpanded = true)}
-			aria-label="展开音乐播放器"
+            aria-label="展开音乐播放器"
+            transition:fly={{ y: 20, duration: 300 }}
 		>
-			<div class="mini-cover" class:spinning={isPlaying}>
+			<div class="w-10 h-10 rounded-full overflow-hidden relative">
 				{#if currentTrack?.pic}
-					<img src={currentTrack.pic} alt="" />
+					<img src={currentTrack.pic} alt="" class="w-full h-full object-cover {isPlaying ? 'animate-spin-slow' : ''}" />
 				{:else}
-					<span>🎵</span>
+					<div class="w-full h-full bg-black/5 dark:bg-white/5 flex items-center justify-center">🎵</div>
 				{/if}
+                <!-- Overlay mask -->
+                <div class="absolute inset-0 bg-black/10 dark:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 			</div>
+            <!-- Playing Indicator ring -->
 			{#if isPlaying}
-				<div class="playing-indicator">
-					<span></span>
-					<span></span>
-					<span></span>
-				</div>
+				<div class="absolute -inset-1 border-2 border-[var(--primary)] rounded-full animate-ping opacity-20"></div>
+                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-[var(--card-bg)] rounded-full flex items-center justify-center shadow-sm">
+                    <Icon icon="material-symbols:music-note" class="text-xs text-[var(--primary)]" />
+                </div>
 			{/if}
 		</button>
 	{/if}
 </div>
 
 <style>
-	.music-player {
-		position: fixed;
-		bottom: 20px;
-		right: 20px;
-		z-index: 1000;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-	}
-
-	/* Minimized View */
-	.player-minimized {
-		width: 56px;
-		height: 56px;
-		border-radius: 50%;
-		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.65 0.16 calc(var(--hue) + 30)));
-		backdrop-filter: blur(10px);
-		border: 2px solid oklch(1 0 0 / 0.2);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 4px 20px oklch(0.5 0.15 var(--hue) / 0.4);
-		transition: all 0.3s ease;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.player-minimized:hover {
-		transform: scale(1.1);
-		box-shadow: 0 6px 30px oklch(0.5 0.15 var(--hue) / 0.6);
-	}
-
-	.mini-cover {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		overflow: hidden;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(255, 255, 255, 0.1);
-	}
-
-	.mini-cover img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	.mini-cover span {
-		font-size: 20px;
-	}
-
-	.spinning {
-		animation: spin 8s linear infinite;
-	}
-
-	@keyframes spin {
-		from {
-			transform: rotate(0deg);
-		}
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	.playing-indicator {
-		position: absolute;
-		bottom: 4px;
-		display: flex;
-		gap: 2px;
-	}
-
-	.playing-indicator span {
-		width: 3px;
-		height: 8px;
-		background: white;
-		border-radius: 2px;
-		animation: wave 0.5s ease infinite alternate;
-	}
-
-	.playing-indicator span:nth-child(2) {
-		animation-delay: 0.15s;
-	}
-
-	.playing-indicator span:nth-child(3) {
-		animation-delay: 0.3s;
-	}
-
-	@keyframes wave {
-		from {
-			height: 4px;
-		}
-		to {
-			height: 12px;
-		}
-	}
-
-	/* Expanded View */
-	.player-expanded {
-		width: 320px;
-		background: linear-gradient(
-			145deg,
-			oklch(0.22 0.02 var(--hue) / 0.95),
-			oklch(0.18 0.015 var(--hue) / 0.98)
-		);
-		backdrop-filter: blur(20px);
-		border-radius: 20px;
-		border: 1px solid oklch(1 0 0 / 0.1);
-		box-shadow: 0 10px 40px oklch(0 0 0 / 0.5),
-			0 0 0 1px oklch(1 0 0 / 0.05) inset;
-		overflow: hidden;
-		animation: slideUp 0.3s ease;
-	}
-
-	@keyframes slideUp {
-		from {
-			opacity: 0;
-			transform: translateY(20px) scale(0.95);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0) scale(1);
-		}
-	}
-
-	.player-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 16px 20px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	}
-
-	.player-title {
-		color: rgba(255, 255, 255, 0.9);
-		font-size: 14px;
-		font-weight: 600;
-	}
-
-	.minimize-btn {
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
-		border: none;
-		background: rgba(255, 255, 255, 0.1);
-		color: rgba(255, 255, 255, 0.7);
-		font-size: 18px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s ease;
-	}
-
-	.minimize-btn:hover {
-		background: rgba(255, 255, 255, 0.2);
-		color: white;
-	}
-
-	.header-btns {
-		display: flex;
-		gap: 8px;
-	}
-
-	.header-icon-btn {
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
-		border: none;
-		background: rgba(255, 255, 255, 0.1);
-		color: rgba(255, 255, 255, 0.7);
-		font-size: 14px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s ease;
-	}
-
-	.header-icon-btn:hover {
-		background: rgba(255, 255, 255, 0.2);
-		color: white;
-	}
-
-	.settings-panel {
-		padding: 16px 20px;
-		background: rgba(0, 0, 0, 0.2);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-		animation: slideDown 0.3s ease;
-	}
-
-	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	.settings-title {
-		color: rgba(255, 255, 255, 0.8);
-		font-size: 13px;
-		font-weight: 600;
-		margin-bottom: 10px;
-	}
-
-	.settings-input-group {
-		display: flex;
-		gap: 8px;
-	}
-
-	.settings-input {
-		flex: 1;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 6px;
-		padding: 6px 10px;
-		color: white;
-		font-size: 13px;
-		outline: none;
-		transition: border-color 0.2s ease;
-	}
-
-	.settings-input:focus {
-		border-color: oklch(0.65 0.14 var(--hue));
-	}
-
-	.settings-btn {
-		background: oklch(0.55 0.14 var(--hue));
-		color: white;
-		border: none;
-		border-radius: 6px;
-		padding: 6px 15px;
-		font-size: 13px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: background 0.2s ease;
-	}
-
-	.settings-btn:hover {
-		background: oklch(0.62 0.14 var(--hue));
-	}
-
-	.settings-hint {
-		color: rgba(255, 255, 255, 0.4);
-		font-size: 11px;
-		margin-top: 6px;
-	}
-
-	.cover-container {
-		display: flex;
-		justify-content: center;
-		padding: 20px;
-	}
-
-	.cover-art {
-		width: 160px;
-		height: 160px;
-		border-radius: 50%;
-		object-fit: cover;
-		box-shadow: 0 8px 30px oklch(0 0 0 / 0.4);
-		border: 4px solid oklch(0.55 0.14 var(--hue) / 0.3);
-	}
-
-	.cover-placeholder {
-		width: 160px;
-		height: 160px;
-		border-radius: 50%;
-		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 60px;
-		box-shadow: 0 8px 30px oklch(0 0 0 / 0.4);
-	}
-
-	.track-info {
-		text-align: center;
-		padding: 0 20px 16px;
-	}
-
-	.track-name {
-		color: white;
-		font-size: 16px;
-		font-weight: 600;
-		margin-bottom: 4px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.track-artist {
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 13px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.progress-container {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		padding: 0 20px 16px;
-	}
-
-	.time-display {
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 11px;
-		min-width: 35px;
-	}
-
-	.progress-bar {
-		flex: 1;
-		height: 6px;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 3px;
-		cursor: pointer;
-		overflow: hidden;
-		border: none;
-		padding: 0;
-	}
-
-	.progress-fill {
-		height: 100%;
-		background: linear-gradient(90deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
-		border-radius: 3px;
-		transition: width 0.1s linear;
-	}
-
-	.controls {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 8px;
-		padding: 0 20px 20px;
-	}
-
-	.control-btn {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		border: none;
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		font-size: 16px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s ease;
-	}
-
-	.control-btn:hover:not(:disabled) {
-		background: rgba(255, 255, 255, 0.2);
-		transform: scale(1.05);
-	}
-
-	.control-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.play-btn {
-		width: 52px;
-		height: 52px;
-		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
-		font-size: 20px;
-	}
-
-	.play-btn:hover:not(:disabled) {
-		background: linear-gradient(135deg, oklch(0.62 0.14 var(--hue)), oklch(0.57 0.16 calc(var(--hue) + 30)));
-		box-shadow: 0 4px 20px oklch(0.5 0.15 var(--hue) / 0.4);
-	}
-
-	.mode-btn {
-		font-size: 14px;
-	}
-
-	.volume-container {
-		position: relative;
-	}
-
-	.volume-slider-container {
-		position: absolute;
-		bottom: 50px;
-		left: 50%;
-		transform: translateX(-50%);
-		background: rgba(30, 30, 45, 0.95);
-		padding: 12px 8px;
-		border-radius: 10px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-	}
-
-	.volume-slider {
-		writing-mode: vertical-lr;
-		direction: rtl;
-		width: 6px;
-		height: 80px;
-		-webkit-appearance: none;
-		appearance: none;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 3px;
-		outline: none;
-	}
-
-	.volume-slider::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 14px;
-		height: 14px;
-		border-radius: 50%;
-		background: linear-gradient(135deg, oklch(0.55 0.14 var(--hue)), oklch(0.50 0.16 calc(var(--hue) + 30)));
-		cursor: pointer;
-	}
-
-	.track-list {
-		max-height: 160px;
-		overflow-y: auto;
-		border-top: 1px solid rgba(255, 255, 255, 0.05);
-		padding: 8px;
-	}
-
-	.track-item {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		padding: 10px 12px;
-		border-radius: 8px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		background: transparent;
-		border: none;
-		width: 100%;
-		text-align: left;
-	}
-
-	.track-item:hover {
-		background: rgba(255, 255, 255, 0.05);
-	}
-
-	.track-item.active {
-		background: oklch(0.55 0.14 var(--hue) / 0.2);
-	}
-
-	.track-index {
-		color: oklch(1 0 0 / 0.3);
-		font-size: 12px;
-		min-width: 20px;
-	}
-
-	.track-item.active .track-index {
-		color: oklch(0.65 0.14 var(--hue));
-	}
-
-	.track-item-name {
-		color: rgba(255, 255, 255, 0.8);
-		font-size: 13px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.track-item.active .track-item-name {
-		color: white;
-	}
-
-	.track-more-btn {
-		width: 100%;
-		background: transparent;
-		border: none;
-		color: rgba(255, 255, 255, 0.4);
-		font-size: 12px;
-		text-align: center;
-		padding: 12px 8px;
-		cursor: pointer;
-		transition: color 0.2s ease;
-	}
-
-	.track-more-btn:hover {
-		color: rgba(255, 255, 255, 0.8);
-	}
-
-	/* Scrollbar Styling */
-	.track-list::-webkit-scrollbar {
-		width: 4px;
-	}
-
-	.track-list::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.track-list::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.2);
-		border-radius: 2px;
-	}
-
-	/* Animation for expanded state */
-	.music-player.expanded {
-		animation: fadeIn 0.3s ease;
-	}
-
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
+/* Custom utility for slow spin */
+.animate-spin-slow {
+    animation: spin 8s linear infinite;
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+/* Hide default range input appearance */
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    opacity: 0;
+}
+.volume-slider::-moz-range-thumb {
+    opacity: 0;
+}
 </style>
