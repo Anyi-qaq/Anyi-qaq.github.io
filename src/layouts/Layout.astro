@@ -6,6 +6,7 @@ import "@fontsource/roboto/700.css";
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import CustomCursor from "@components/CustomCursor.svelte";
 import MusicPlayer from "@components/MusicPlayer.svelte";
+import MusicVisualizer from "@components/MusicVisualizer.svelte";
 import StarrySky from "@components/StarrySky.svelte";
 import { musicPlayerConfig, profileConfig, siteConfig } from "@/config";
 import {
@@ -165,6 +166,7 @@ const bannerOffset =
 				volume={musicPlayerConfig.volume}
 			/>
 		)}
+		<MusicVisualizer client:load />
 		<slot />
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->

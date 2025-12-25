@@ -2,6 +2,7 @@
 import Icon from "@iconify/svelte";
 import { onMount } from "svelte";
 import { fade, fly, slide } from "svelte/transition";
+import { audioContextStore } from "../store/audioStore";
 
 // Props
 interface Props {
@@ -11,12 +12,13 @@ interface Props {
 }
 
 let {
-	playlistId = "3778678",
+	playlistId: initialPlaylistId = "3778678",
 	autoplay = false,
 	volume = 0.5,
 }: Props = $props();
 
 // State
+let playlistId = $state(initialPlaylistId);
 let isExpanded = $state(false);
 let isPlaying = $state(false);
 let isLoading = $state(true);
@@ -28,7 +30,8 @@ let currentTrackIndex = $state(0);
 let playMode = $state<"order" | "random" | "loop">("order");
 let isSettingsOpen = $state(false);
 let isListExpanded = $state(false);
-let inputPlaylistId = $state(playlistId);
+let inputPlaylistId = $state(initialPlaylistId);
+let useVisualizer = $state(true); // Attempt visualizer by default
 
 // Track list
 let tracks = $state<
@@ -177,6 +180,11 @@ function updatePlaylistId() {
 $effect(() => {
 	if (currentTrack && audioRef) {
 		audioRef.src = currentTrack.url;
+		if (useVisualizer) {
+			audioRef.crossOrigin = "anonymous";
+		} else {
+			audioRef.crossOrigin = null;
+		}
 		audioRef.load();
 		if (isPlaying || autoplay) {
 			audioRef.play().catch(() => {
@@ -186,6 +194,21 @@ $effect(() => {
 		}
 	}
 });
+
+// Handle audio error (likely CORS if useVisualizer is true)
+function handleAudioError() {
+	if (useVisualizer) {
+		console.warn(
+			"Audio load failed with CORS, falling back to non-visualizer mode",
+		);
+		useVisualizer = false;
+		if (audioRef) {
+			audioRef.crossOrigin = null;
+			audioRef.load();
+			audioRef.play().catch(console.error);
+		}
+	}
+}
 
 // Initialize
 onMount(() => {
@@ -249,6 +272,31 @@ function getPlayModeTitle(): string {
 	}
 }
 
+// Initialize Audio Context
+function initAudioContext() {
+	if (!audioRef || $audioContextStore.audioContext) return;
+
+	try {
+		const AudioContext =
+			window.AudioContext || (window as any).webkitAudioContext;
+		const ctx = new AudioContext();
+		const analyser = ctx.createAnalyser();
+		analyser.fftSize = 512;
+
+		const source = ctx.createMediaElementSource(audioRef);
+		source.connect(analyser);
+		analyser.connect(ctx.destination);
+
+		audioContextStore.set({
+			audioContext: ctx,
+			analyser: analyser,
+			source: source,
+		});
+	} catch (e) {
+		console.error("Failed to init audio context:", e);
+	}
+}
+
 // Keyboard Controls
 function handleKeydown(event: KeyboardEvent) {
 	if (!isExpanded) return;
@@ -276,9 +324,18 @@ function handleKeydown(event: KeyboardEvent) {
 	bind:this={audioRef}
 	bind:currentTime
 	bind:duration
-	onplay={() => (isPlaying = true)}
+	onplay={() => {
+        isPlaying = true;
+        if (useVisualizer) {
+            initAudioContext();
+        }
+        if ($audioContextStore.audioContext?.state === 'suspended') {
+            $audioContextStore.audioContext.resume();
+        }
+    }}
 	onpause={() => (isPlaying = false)}
 	onended={handleEnded}
+    onerror={handleAudioError}
 	volume={currentVolume}
 ></audio>
 
@@ -328,7 +385,7 @@ function handleKeydown(event: KeyboardEvent) {
 							type="text"
 							bind:value={inputPlaylistId}
 							placeholder="输入网易云歌单ID"
-							class="flex-1 bg-[var(--page-bg)] border border-black/5 dark:border-white/5 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-[var(--primary)] transition-colors"
+							class="flex-1 bg-[var(--page-bg)] text-black/90 dark:text-white/90 border border-black/5 dark:border-white/5 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-[var(--primary)] transition-colors"
 						/>
 						<button
 							type="button"
