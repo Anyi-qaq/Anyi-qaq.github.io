@@ -11,15 +11,15 @@ lang: ''
 
 ### AI太好用了你知道吗
 
-安装AI Cli助手(iflow)
+安装AI Cli助手(opencode)
 
 ```bash
-bash -c "$(curl -fsSL https://cloud.iflow.cn/iflow-cli/install.sh)"
+npm i -g opencode-ai
 ```
 
-~~iflow 真挺好用的~~
+~~opencode 真挺好用的~~
 
-启动 iflow
+启动 opencode
 
 **尽量不要在家目录下启动任何AI助手**
 
