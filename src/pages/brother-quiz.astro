@@ -233,16 +233,12 @@ const results = [
 ---
 
 <MainGridLayout title={quizTitle} description={quizDescription}>
-  <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
-    <div class="card-base z-10 px-9 py-6 relative w-full">
-      <QuizApp
-        quizTitle={quizTitle}
-        quizDescription={quizDescription}
-        scoreLabel="兄控指数"
-        questions={questions}
-        results={results}
-        client:load
-      />
-    </div>
-  </div>
+    <QuizApp
+      quizTitle={quizTitle}
+      quizDescription={quizDescription}
+      scoreLabel="兄控指数"
+      questions={questions}
+      results={results}
+      client:load
+    />
 </MainGridLayout>

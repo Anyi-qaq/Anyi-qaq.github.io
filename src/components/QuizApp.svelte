@@ -148,18 +148,18 @@
           <div class="flex flex-col gap-3">
             {#each currentQuestion.options as option, i}
               <button
-                class="w-full text-left px-4 py-3 md:px-5 md:py-3.5 rounded-[var(--radius-large)] border border-black/10 dark:border-white/10 
-                       bg-black/[0.02] dark:bg-white/[0.03] hover:bg-[var(--btn-plain-bg-hover)] 
-                       hover:border-[var(--primary)]/30 transition-all duration-200
+                class="w-full text-left px-4 py-3 md:px-5 md:py-3.5 rounded-[var(--radius-large)] border border-black/10 dark:border-white/15
+                       bg-black/[0.02] dark:bg-white/[0.06] hover:bg-[var(--btn-plain-bg-hover)] dark:hover:bg-white/[0.12]
+                       hover:border-[var(--primary)]/30 dark:hover:border-[var(--primary)]/40 transition-all duration-200
                        text-sm md:text-base leading-relaxed"
                 class:selected={selectedOption === i}
                 on:click={() => selectOption(i)}
                 disabled={isTransitioning}
               >
                 <span class="inline-flex items-center gap-2">
-                  <span class="flex-shrink-0 w-6 h-6 rounded-full border border-black/20 dark:border-white/20 
-                               flex items-center justify-center text-xs font-medium
-                               text-black/50 dark:text-white/50">
+                  <span class="flex-shrink-0 w-6 h-6 rounded-full border border-black/20 dark:border-white/25
+                               dark:bg-white/[0.08] flex items-center justify-center text-xs font-medium
+                               text-black/50 dark:text-white/70">
                     {String.fromCharCode(65 + i)}
                   </span>
                   <span>{option.text}</span>
