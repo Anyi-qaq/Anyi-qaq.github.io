@@ -1,0 +1,526 @@
+---
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+---
+
+<MainGridLayout title="兄控属性测试" description="测试你的兄控程度">
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+        <div class="card-base z-10 px-9 py-6 relative w-full">
+            <div id="quiz-container" class="max-w-3xl mx-auto">
+                <!-- 开始界面 -->
+                <div id="start-screen" class="text-center py-12">
+                    <h1 class="text-4xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                        兄控属性测试
+                    </h1>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+                        这是一个有趣的心理测试，通过 20 道题目来测试你的"兄控"属性程度。<br/>
+                        请根据第一直觉作答，不要思考太久哦~
+                    </p>
+                    <div class="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-6 mb-8">
+                        <h3 class="font-semibold text-pink-700 dark:text-pink-300 mb-3">测试说明：</h3>
+                        <ul class="text-left space-y-2 text-gray-700 dark:text-gray-300">
+                            <li>✓ 共 20 道选择题</li>
+                            <li>✓ 每题有 4 个选项（A/B/C/D）</li>
+                            <li>✓ 完成后会显示你的兄控类型</li>
+                            <li>✓ 5 种不同的结果类型等你发现</li>
+                        </ul>
+                    </div>
+                    <button id="start-btn" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg">
+                        开始测试
+                    </button>
+                </div>
+
+                <!-- 答题界面 -->
+                <div id="quiz-screen" class="hidden">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">进度</span>
+                            <span id="progress-text" class="text-sm font-medium text-pink-600 dark:text-pink-400">1/20</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                            <div id="progress-bar" class="bg-gradient-to-r from-pink-500 to-purple-600 h-3 rounded-full transition-all duration-300" style="width: 5%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg mb-6">
+                        <h2 id="question-number" class="text-sm font-semibold text-pink-600 dark:text-pink-400 mb-3">第 1 题</h2>
+                        <p id="question-text" class="text-xl font-medium text-gray-800 dark:text-gray-100 mb-8 leading-relaxed"></p>
+                        
+                        <div id="options-container" class="space-y-4">
+                            <!-- 选项将通过 JavaScript 动态生成 -->
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button id="prev-btn" class="px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-all" disabled>
+                            ← 上一题
+                        </button>
+                        <button id="next-btn" class="px-8 py-3 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium hover:from-pink-600 hover:to-purple-700 transition-all">
+                            下一题 →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 结果界面 -->
+                <div id="result-screen" class="hidden">
+                    <div class="text-center py-8">
+                        <div class="mb-6">
+                            <span class="text-6xl">🎉</span>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-4 text-gray-800 dark:text-gray-100">测试完成！</h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-8">你的兄控属性类型是：</p>
+                        
+                        <div id="result-card" class="bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-3xl p-8 mb-8 shadow-xl">
+                            <div id="result-icon" class="text-7xl mb-4"></div>
+                            <h3 id="result-title" class="text-3xl font-bold text-pink-700 dark:text-pink-300 mb-3"></h3>
+                            <p id="result-score" class="text-lg font-semibold text-purple-600 dark:text-purple-400 mb-4"></p>
+                            <p id="result-description" class="text-gray-700 dark:text-gray-300 leading-relaxed"></p>
+                        </div>
+
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">各维度得分：</h4>
+                            <div id="score-details" class="space-y-3"></div>
+                        </div>
+
+                        <button id="restart-btn" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg">
+                            重新测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .option-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .dark .option-btn {
+            border-color: #4b5563;
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+
+        .option-btn:hover {
+            border-color: #ec4899;
+            background: #fdf2f8;
+            transform: translateX(8px);
+        }
+
+        .dark .option-btn:hover {
+            background: #374151;
+        }
+
+        .option-btn.selected {
+            border-color: #ec4899;
+            background: linear-gradient(to right, #fdf2f8, #fae8ff);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+        }
+
+        .dark .option-btn.selected {
+            background: linear-gradient(to right, #374151, #4c1d95);
+        }
+
+        .option-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+
+    <script>
+        // 测试题目数据
+        const questions = [
+            {
+                question: "当哥哥夸奖你时，你的心情是？",
+                options: {
+                    A: { text: "超级开心，一整天都充满动力", score: 4 },
+                    B: { text: "有点高兴，但不会表现得太明显", score: 2 },
+                    C: { text: "无所谓，习惯了", score: 1 },
+                    D: { text: "反而觉得有点尴尬", score: 0 }
+                }
+            },
+            {
+                question: "哥哥生日快到了，你会？",
+                options: {
+                    A: { text: "提前很久准备惊喜礼物和祝福", score: 4 },
+                    B: { text: "记得买礼物，但不会太隆重", score: 2 },
+                    C: { text: "可能会忘记，需要别人提醒", score: 1 },
+                    D: { text: "完全不记得这回事", score: 0 }
+                }
+            },
+            {
+                question: "看到哥哥和其他女生聊天，你的反应是？",
+                options: {
+                    A: { text: "内心警铃大作，想要介入对话", score: 4 },
+                    B: { text: "有点在意，但不会表现出来", score: 2 },
+                    C: { text: "没什么感觉，很正常", score: 1 },
+                    D: { text: "反而会帮哥哥制造机会", score: 0 }
+                }
+            },
+            {
+                question: "平时会主动找哥哥聊天吗？",
+                options: {
+                    A: { text: "经常找话题，想要多和他交流", score: 4 },
+                    B: { text: "偶尔会，看情况", score: 2 },
+                    C: { text: "很少，有事才说", score: 1 },
+                    D: { text: "几乎不主动", score: 0 }
+                }
+            },
+            {
+                question: "哥哥送你礼物时，你会？",
+                options: {
+                    A: { text: "珍藏起来，反复回味这份心意", score: 4 },
+                    B: { text: "很开心地收下并使用", score: 2 },
+                    C: { text: "普通地收下", score: 1 },
+                    D: { text: "觉得没必要，浪费钱", score: 0 }
+                }
+            },
+            {
+                question: "你手机里哥哥的照片数量？",
+                options: {
+                    A: { text: "很多，还有各种偷拍和合照", score: 4 },
+                    B: { text: "有一些，都是正常场合拍的", score: 2 },
+                    C: { text: "寥寥几张", score: 1 },
+                    D: { text: "一张都没有", score: 0 }
+                }
+            },
+            {
+                question: "哥哥遇到困难时，你会？",
+                options: {
+                    A: { text: "比他还着急，想尽办法帮忙", score: 4 },
+                    B: { text: "主动询问是否需要帮助", score: 2 },
+                    C: { text: "等他开口求助再说", score: 1 },
+                    D: { text: "觉得他自己能解决", score: 0 }
+                }
+            },
+            {
+                question: "对哥哥的称呼是？",
+                options: {
+                    A: { text: "哥哥、欧尼酱等亲昵称呼", score: 4 },
+                    B: { text: "直接叫哥哥", score: 2 },
+                    C: { text: "叫名字或昵称", score: 1 },
+                    D: { text: "喂、那个谁...", score: 0 }
+                }
+            },
+            {
+                question: "哥哥出门时，你会？",
+                options: {
+                    A: { text: "叮嘱注意安全，问他去哪和谁一起", score: 4 },
+                    B: { text: "简单说声路上小心", score: 2 },
+                    C: { text: "没什么反应", score: 1 },
+                    D: { text: "希望他早点出门", score: 0 }
+                }
+            },
+            {
+                question: "会和哥哥分享自己的秘密吗？",
+                options: {
+                    A: { text: "什么都会和他说，最信任的人", score: 4 },
+                    B: { text: "重要的事会说", score: 2 },
+                    C: { text: "一般不会", score: 1 },
+                    D: { text: "绝对不会", score: 0 }
+                }
+            },
+            {
+                question: "哥哥做的饭，你觉得？",
+                options: {
+                    A: { text: "全世界最好吃！", score: 4 },
+                    B: { text: "还不错，挺好吃的", score: 2 },
+                    C: { text: "一般般吧", score: 1 },
+                    D: { text: "不如我自己做的", score: 0 }
+                }
+            },
+            {
+                question: "看到哥哥疲惫的样子，你会？",
+                options: {
+                    A: { text: "心疼不已，想要照顾他", score: 4 },
+                    B: { text: "关心一下，让他休息", score: 2 },
+                    C: { text: "没什么特别感觉", score: 1 },
+                    D: { text: "活该，谁让他不注意身体", score: 0 }
+                }
+            },
+            {
+                question: "希望哥哥对你的态度是？",
+                options: {
+                    A: { text: "只对我一个人温柔特别", score: 4 },
+                    B: { text: "像平常一样就好", score: 2 },
+                    C: { text: "不要太管着我", score: 1 },
+                    D: { text: "离我远点", score: 0 }
+                }
+            },
+            {
+                question: "哥哥的朋友来家里玩，你会？",
+                options: {
+                    A: { text: "有点不爽，想独占哥哥", score: 4 },
+                    B: { text: "礼貌招待，但希望他们早点走", score: 2 },
+                    C: { text: "正常相处", score: 1 },
+                    D: { text: "正好自己也可以出去玩", score: 0 }
+                }
+            },
+            {
+                question: "会关注哥哥的社交动态吗？",
+                options: {
+                    A: { text: "每条都看，还会点赞评论", score: 4 },
+                    B: { text: "偶尔看看", score: 2 },
+                    C: { text: "刷到就看一下", score: 1 },
+                    D: { text: "从不关注", score: 0 }
+                }
+            },
+            {
+                question: "如果哥哥要搬出去住，你会？",
+                options: {
+                    A: { text: "非常不舍，想办法挽留", score: 4 },
+                    B: { text: "虽然不舍但会支持", score: 2 },
+                    C: { text: "无所谓", score: 1 },
+                    D: { text: "太好了，终于有自己的空间了", score: 0 }
+                }
+            },
+            {
+                question: "哥哥夸别的男生优秀时，你会？",
+                options: {
+                    A: { text: "不开心，觉得哥哥在暗示什么", score: 4 },
+                    B: { text: "有点小情绪", score: 2 },
+                    C: { text: "听听而已", score: 1 },
+                    D: { text: "那就去认识一下", score: 0 }
+                }
+            },
+            {
+                question: "最喜欢和哥哥一起做什么？",
+                options: {
+                    A: { text: "做什么都好，只要在一起", score: 4 },
+                    B: { text: "看电影、吃饭之类的", score: 2 },
+                    C: { text: "没什么特别喜欢的", score: 1 },
+                    D: { text: "不想和他一起做事", score: 0 }
+                }
+            },
+            {
+                question: "哥哥生病时，你会？",
+                options: {
+                    A: { text: "寸步不离地照顾，比谁都担心", score: 4 },
+                    B: { text: "关心照顾，帮他拿药倒水", score: 2 },
+                    C: { text: "问候一下", score: 1 },
+                    D: { text: "让他自己多喝热水", score: 0 }
+                }
+            },
+            {
+                question: "如果用一种动物形容你和哥哥的关系，你会选？",
+                options: {
+                    A: { text: "连体婴/粘人的小猫", score: 4 },
+                    B: { text: "亲密的伙伴/小狗", score: 2 },
+                    C: { text: "普通的家人/猫", score: 1 },
+                    D: { text: "陌生人/独狼", score: 0 }
+                }
+            }
+        ];
+
+        // 结果类型
+        const resultTypes = [
+            {
+                name: "究极兄控",
+                icon: "💖",
+                minScore: 70,
+                description: "你对哥哥的爱已经超越了普通兄妹/姐弟的界限！哥哥是你生命中最重要的人，你的世界里几乎只有他。你会为哥哥付出一切，也会因为他的一举一动而情绪起伏。这种感情虽然深厚，但也要注意保持适当的距离哦~"
+            },
+            {
+                name: "重度兄控",
+                icon: "💗",
+                minScore: 55,
+                description: "你非常喜欢和依赖哥哥！哥哥在你心中占据着非常重要的位置，你会不自觉地关注他的一切，希望得到他的认可和关注。虽然还没有到痴迷的程度，但兄控属性已经很明显了！"
+            },
+            {
+                name: "中度兄控",
+                icon: "💕",
+                minScore: 40,
+                description: "你和哥哥的关系很好，有一定的依赖和喜欢，但还保持着相对理性的状态。你会关心哥哥，也会享受和他在一起的时光，但同时也有自己的生活。这是比较健康的兄妹/姐弟关系呢！"
+            },
+            {
+                name: "轻度兄控",
+                icon: "💓",
+                minScore: 25,
+                description: "你对哥哥有好感，但更多是普通的亲情。你们的关系还算不错，但不会特别黏着对方。你有自己独立的生活圈子和兴趣爱好，哥哥只是你生活中的一部分而已。"
+            },
+            {
+                name: "无兄控属性",
+                icon: "💙",
+                minScore: 0,
+                description: "你和哥哥的关系比较平淡，或者说你本身就是个很独立的人。你对哥哥没有特别的依恋或崇拜，更像是普通的朋友或家人。这也没什么不好的，每个人表达亲情的方式都不同嘛~"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+        let scores = { A: 0, B: 0, C: 0, D: 0 };
+
+        // DOM 元素
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const startBtn = document.getElementById('start-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const questionNumber = document.getElementById('question-number');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+
+        // 开始测试
+        startBtn.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('fade-in');
+            renderQuestion();
+        });
+
+        // 渲染题目
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            questionNumber.textContent = `第 ${currentQuestion + 1} 题`;
+            questionText.textContent = q.question;
+            progressText.textContent = `${currentQuestion + 1}/${questions.length}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+
+            optionsContainer.innerHTML = '';
+            Object.entries(q.options).forEach(([key, option]) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                if (answers[currentQuestion] === key) {
+                    btn.classList.add('selected');
+                }
+                btn.innerHTML = `<span class="font-bold text-pink-600 dark:text-pink-400 mr-3">${key}.</span>${option.text}`;
+                btn.onclick = () => selectOption(key);
+                optionsContainer.appendChild(btn);
+            });
+
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.textContent = currentQuestion === questions.length - 1 ? '查看结果' : '下一题 →';
+        }
+
+        // 选择选项
+        function selectOption(optionKey) {
+            answers[currentQuestion] = optionKey;
+            renderQuestion();
+        }
+
+        // 上一题
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        });
+
+        // 下一题/查看结果
+        nextBtn.addEventListener('click', () => {
+            if (!answers[currentQuestion]) {
+                alert('请先选择一个选项哦~');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
+        });
+
+        // 计算结果
+        function calculateResult() {
+            // 计算总分和各选项得分
+            let totalScore = 0;
+            scores = { A: 0, B: 0, C: 0, D: 0 };
+
+            answers.forEach((answer, index) => {
+                if (answer) {
+                    const score = questions[index].options[answer].score;
+                    totalScore += score;
+                    scores[answer] += score;
+                }
+            });
+
+            // 确定结果类型
+            let result = resultTypes[resultTypes.length - 1];
+            for (let i = 0; i < resultTypes.length; i++) {
+                if (totalScore >= resultTypes[i].minScore) {
+                    result = resultTypes[i];
+                    break;
+                }
+            }
+
+            showResult(result, totalScore);
+        }
+
+        // 显示结果
+        function showResult(result, totalScore) {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('fade-in');
+
+            document.getElementById('result-icon').textContent = result.icon;
+            document.getElementById('result-title').textContent = result.name;
+            document.getElementById('result-score').textContent = `总分：${totalScore} / 80`;
+            document.getElementById('result-description').textContent = result.description;
+
+            // 显示各维度得分
+            const scoreDetails = document.getElementById('score-details');
+            scoreDetails.innerHTML = `
+                <div class="flex items-center">
+                    <span class="w-8 font-bold text-pink-600 dark:text-pink-400">A:</span>
+                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 ml-2">
+                        <div class="bg-pink-500 h-4 rounded-full transition-all" style="width: ${(scores.A / 32) * 100}%"></div>
+                    </div>
+                    <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">${scores.A}分</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-8 font-bold text-purple-600 dark:text-purple-400">B:</span>
+                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 ml-2">
+                        <div class="bg-purple-500 h-4 rounded-full transition-all" style="width: ${(scores.B / 32) * 100}%"></div>
+                    </div>
+                    <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">${scores.B}分</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-8 font-bold text-blue-600 dark:text-blue-400">C:</span>
+                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 ml-2">
+                        <div class="bg-blue-500 h-4 rounded-full transition-all" style="width: ${(scores.C / 32) * 100}%"></div>
+                    </div>
+                    <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">${scores.C}分</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-8 font-bold text-gray-600 dark:text-gray-400">D:</span>
+                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 ml-2">
+                        <div class="bg-gray-500 h-4 rounded-full transition-all" style="width: ${(scores.D / 32) * 100}%"></div>
+                    </div>
+                    <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">${scores.D}分</span>
+                </div>
+            `;
+        }
+
+        // 重新开始
+        restartBtn.addEventListener('click', () => {
+            currentQuestion = 0;
+            answers = new Array(questions.length).fill(null);
+            scores = { A: 0, B: 0, C: 0, D: 0 };
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            startScreen.classList.add('fade-in');
+        });
+    </script>
+</MainGridLayout>
