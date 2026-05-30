@@ -1,0 +1,248 @@
+---
+import QuizApp from "../components/QuizApp.svelte";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+
+const quizTitle = "妹控指数测试";
+const quizDescription = "你对妹妹的宠爱到底超出了正常范围多少？20道题测出你的妹控指数，看看你是钢铁直兄还是无可救药的终极妹控！";
+
+const questions = [
+  {
+    text: "你妹妹突然说「今天我交了个男朋友」，你的第一反应是？",
+    options: [
+      { text: "真心祝福她，问问对方是什么样的人", score: 0 },
+      { text: "表面上恭喜，但会要求见见对方", score: 1 },
+      { text: "心里很不舒服，找各种理由反对", score: 2 },
+      { text: "当场爆炸，觉得世上没人配得上我妹", score: 3 },
+    ],
+  },
+  {
+    text: "你妹妹晚上还没回家，你会？",
+    options: [
+      { text: "相信她有自己的安排", score: 0 },
+      { text: "发消息问一下什么时候回来", score: 1 },
+      { text: "坐立不安，一直等她回来才放心", score: 2 },
+      { text: "直接出门去接她，全程护送", score: 3 },
+    ],
+  },
+  {
+    text: "有人欺负你妹妹，你的反应是？",
+    options: [
+      { text: "让她自己处理，培养独立能力", score: 0 },
+      { text: "了解一下情况，给点建议", score: 1 },
+      { text: "立刻去找对方谈话", score: 2 },
+      { text: "让对方后悔来到这个世界上", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹小时候的萌照被翻出来，你？",
+    options: [
+      { text: "跟着笑笑，没啥特别感觉", score: 0 },
+      { text: "觉得挺可爱的", score: 1 },
+      { text: "偷偷用手机拍下来保存", score: 2 },
+      { text: "立刻设成手机壁纸和各种头像", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹带朋友（异性）回家，你的反应？",
+    options: [
+      { text: "正常打个招呼，不干涉", score: 0 },
+      { text: "出来聊两句了解一下", score: 1 },
+      { text: "全程在客厅「恰巧」路过", score: 2 },
+      { text: "直接拿出户口本开始盘问对方", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹说要去外地上大学，你？",
+    options: [
+      { text: "支持她的选择，出去见见世面挺好的", score: 0 },
+      { text: "有点担心但不会阻拦", score: 1 },
+      { text: "强烈建议选本地的学校", score: 2 },
+      { text: "认真考虑辞职陪她去那个城市", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹在你面前哭了，你的反应是？",
+    options: [
+      { text: "问她怎么了，正常关心一下", score: 0 },
+      { text: "安慰她，帮她分析问题", score: 1 },
+      { text: "心疼得要命，不管是谁的错先站她这边", score: 2 },
+      { text: "觉得她哭起来也好可爱然后被自己的想法吓到", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹过生日你忘了准备礼物，你？",
+    options: [
+      { text: "补一个就好，她不会在意的", score: 0 },
+      { text: "有点愧疚，赶紧想办法补救", score: 1 },
+      { text: "自责很久，觉得对不起她", score: 2 },
+      { text: "觉得自己简直是世界上最差劲的哥哥", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹穿了一件你觉得太暴露的衣服，你？",
+    options: [
+      { text: "穿什么是她的自由", score: 0 },
+      { text: "委婉地提醒一下", score: 1 },
+      { text: "强烈反对，要求她换掉", score: 2 },
+      { text: "直接把自己的外套给她披上，不许脱", score: 3 },
+    ],
+  },
+  {
+    text: "打游戏的时候妹妹抢了你的 MVP，你？",
+    options: [
+      { text: "认了，她确实玩得好", score: 0 },
+      { text: "夸她厉害，下次再来", score: 1 },
+      { text: "虽然输了但看她开心自己也开心", score: 2 },
+      { text: "截图发朋友圈「我妹妹天下第一」", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹生病了，你的反应？",
+    options: [
+      { text: "叮嘱她吃药多喝水", score: 0 },
+      { text: "去看看她，带点水果", score: 1 },
+      { text: "请假不去上班全程照顾", score: 2 },
+      { text: "一夜不睡守在她床边寸步不离", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹跟你分享她的烦恼时，你？",
+    options: [
+      { text: "正常倾听，给点建议", score: 0 },
+      { text: "认真出谋划策帮她解决", score: 1 },
+      { text: "恨不得替她解决所有问题", score: 2 },
+      { text: "觉得她连烦恼的样子都超可爱", score: 3 },
+    ],
+  },
+  {
+    text: "爸妈说给你介绍对象，你心里想？",
+    options: [
+      { text: "好啊，见见也无妨", score: 0 },
+      { text: "随缘吧，不急", score: 1 },
+      { text: "世界上最好的女孩已经在我身边了", score: 2 },
+      { text: "直接拒绝，不需要任何人", score: 3 },
+    ],
+  },
+  {
+    text: "别人夸你「你对你妹真好」，你心里的想法？",
+    options: [
+      { text: "应该的，做哥哥的本分", score: 0 },
+      { text: "还行吧，也没多好", score: 1 },
+      { text: "我对她的好远不止你们看到的这些", score: 2 },
+      { text: "这就叫好？你们根本不知道我还能更好", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹出国旅行一周没联系你，你？",
+    options: [
+      { text: "很正常，旅行嘛玩得开心就好", score: 0 },
+      { text: "偶尔会想她在干嘛", score: 1 },
+      { text: "每天等她的消息等到焦虑", score: 2 },
+      { text: "在她社交账号下每天留言「想你了」", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹说「哥，你今天好帅」，你的反应？",
+    options: [
+      { text: "说声谢谢，然后该干嘛干嘛", score: 0 },
+      { text: "心里有点开心", score: 1 },
+      { text: "开心得不行但假装淡定", score: 2 },
+      { text: "立刻去镜子前确认，决定以后天天这样穿", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹喝醉了给你打电话，你？",
+    options: [
+      { text: "让她早点休息，挂电话", score: 0 },
+      { text: "陪她聊着直到她睡着", score: 1 },
+      { text: "立刻出门飞奔去找她", score: 2 },
+      { text: "觉得喝醉的妹妹好萌然后打车冲过去", score: 3 },
+    ],
+  },
+  {
+    text: "妹妹说「要不我们以后一直住一起吧」，你？",
+    options: [
+      { text: "不太方便吧，各自有各自的生活", score: 0 },
+      { text: "可以考虑考虑", score: 1 },
+      { text: "好啊，以后房子买大一点", score: 2 },
+      { text: "已经开始看双人户型的房子了", score: 3 },
+    ],
+  },
+  {
+    text: "看到妹妹手机壁纸是别的男生，你？",
+    options: [
+      { text: "不关我的事", score: 0 },
+      { text: "随口问一句是谁", score: 1 },
+      { text: "心里不舒服，想让它从屏幕上消失", score: 2 },
+      { text: "趁她不在的时候偷偷换成你们的合照", score: 3 },
+    ],
+  },
+  {
+    text: "在重要的事情上必须在「女朋友」和「妹妹」之间做选择，你？",
+    options: [
+      { text: "看具体情况，不能一概而论", score: 0 },
+      { text: "会尽量平衡两者", score: 1 },
+      { text: "犹豫很久…最后还是选妹妹", score: 2 },
+      { text: "根本不需要犹豫，永远是我妹妹", score: 3 },
+    ],
+  },
+];
+
+const results = [
+  {
+    title: "钢铁直兄",
+    emoji: "🦾",
+    description: "你对你妹主打一个放养模式。该说就说、该骂就骂，从不觉得需要特别照顾。妹控？不存在的，你觉得那些整天「我妹世界第一可爱」的人怕不是脑子有问题。你们的兄妹关系健康得可以写进教科书。",
+    minScore: 0,
+    maxScore: 25,
+    color: "#10b981",
+  },
+  {
+    title: "轻度妹控",
+    emoji: "🌸",
+    description: "你承认你妹确实挺可爱的，偶尔也会在朋友面前炫耀一下「我妹学习可好了」。但也仅此而已——你依然有自己的生活重心，不会整天围着她转。属于正常范围内的兄妹情，没什么好大惊小怪的。",
+    minScore: 26,
+    maxScore: 45,
+    color: "#3b82f6",
+  },
+  {
+    title: "中度妹控",
+    emoji: "🔥",
+    description: "危险信号已亮起。你开始不自觉地把妹妹放在优先位置，会因为她不回消息而心神不宁，会对她身边的异性产生一种莫名的警惕。你嘴上说「正常兄妹都这样」，但心里隐约知道自己在骗自己。",
+    minScore: 46,
+    maxScore: 65,
+    color: "#f59e0b",
+  },
+  {
+    title: "重度妹控",
+    emoji: "💀",
+    description: "已经病入膏肓了。你的生活轨迹基本以妹妹为中心，她的喜怒哀乐直接决定你的心情。你手机相册里她的照片占了半壁江山，你对每一个试图靠近她的异性都有种说不清道不明的敌意。别装了，你就是传说中的那个人。",
+    minScore: 66,
+    maxScore: 80,
+    color: "#f97316",
+  },
+  {
+    title: "终极妹控",
+    emoji: "👑",
+    description: "恭喜，你已经达到了妹控的究极形态。在你的词典里，「妹妹」这个词自带神圣光环。你甚至可能在某个深夜认真思考过一些超越兄妹关系的问题。这个测试对你来说不过是走个形式——你早就知道答案了不是吗？",
+    minScore: 81,
+    maxScore: 100,
+    color: "#ef4444",
+  },
+];
+---
+
+<MainGridLayout title={quizTitle} description={quizDescription}>
+  <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+    <div class="card-base z-10 px-9 py-6 relative w-full">
+      <QuizApp
+        quizTitle={quizTitle}
+        quizDescription={quizDescription}
+        scoreLabel="妹控指数"
+        questions={questions}
+        results={results}
+        client:load
+      />
+    </div>
+  </div>
+</MainGridLayout>

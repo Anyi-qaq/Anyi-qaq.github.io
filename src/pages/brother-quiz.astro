@@ -1,0 +1,248 @@
+---
+import QuizApp from "../components/QuizApp.svelte";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+
+const quizTitle = "兄控指数测试";
+const quizDescription = "你对他到底有多执着？20道题测出你的兄控指数，看看你是钢铁直妹还是病入膏肓的终极兄控！";
+
+const questions = [
+  {
+    text: "你哥突然说「我今天交了个女朋友」，你的第一反应是？",
+    options: [
+      { text: "真心为他高兴，立刻八卦对方是谁", score: 0 },
+      { text: "祝福他，但心里有点小失落", score: 1 },
+      { text: "表面恭喜，但会偷偷去调查那个女生", score: 2 },
+      { text: "心里极度不爽，觉得没人配得上我哥", score: 3 },
+    ],
+  },
+  {
+    text: "你哥加班到很晚还没回家，你会？",
+    options: [
+      { text: "正常做自己的事，他成年人了自己会照顾自己", score: 0 },
+      { text: "发条消息关心一下", score: 1 },
+      { text: "等他回来才安心，期间不停看手机", score: 2 },
+      { text: "去他公司楼下等他，带他爱吃的夜宵", score: 3 },
+    ],
+  },
+  {
+    text: "有人在你面前说你哥的坏话，你什么反应？",
+    options: [
+      { text: "无所谓，每个人都有缺点", score: 0 },
+      { text: "会帮他说两句好话", score: 1 },
+      { text: "立刻反驳，不许任何人说我哥不好", score: 2 },
+      { text: "当场暴怒，让对方付出代价", score: 3 },
+    ],
+  },
+  {
+    text: "你哥小时候的照片被爸妈翻出来给大家看，你？",
+    options: [
+      { text: "跟着一起笑，觉得挺可爱的", score: 0 },
+      { text: "觉得有趣，但没什么特别感觉", score: 1 },
+      { text: "偷偷用手机拍下来收藏", score: 2 },
+      { text: "觉得太可爱了想把所有照片都要过来", score: 3 },
+    ],
+  },
+  {
+    text: "你哥的朋友来家里玩，你通常会？",
+    options: [
+      { text: "正常打招呼然后回自己房间", score: 0 },
+      { text: "出来招待一下，尽地主之谊", score: 1 },
+      { text: "暗中观察有没有可疑人物带坏我哥", score: 2 },
+      { text: "全程在场，不准任何人接近我哥", score: 3 },
+    ],
+  },
+  {
+    text: "你哥说他要搬出去自己住了，你？",
+    options: [
+      { text: "支持他的决定，独立是好事", score: 0 },
+      { text: "有点舍不得，但尊重他的选择", score: 1 },
+      { text: "试图找各种理由让他留下", score: 2 },
+      { text: "崩溃大哭，死都不让他走", score: 3 },
+    ],
+  },
+  {
+    text: "看到你哥和一个女生有说有笑地走在街上，你？",
+    options: [
+      { text: "正常，他也有自己的社交圈", score: 0 },
+      { text: "远远看一眼就离开了", score: 1 },
+      { text: "立刻打电话问他在哪跟谁在一起", score: 2 },
+      { text: "冲过去挤到他们中间宣示主权", score: 3 },
+    ],
+  },
+  {
+    text: "过生日的时候，你哥忘了给你准备礼物，你？",
+    options: [
+      { text: "没关系，他可能太忙了", score: 0 },
+      { text: "有点小失望但不会说", score: 1 },
+      { text: "难过一整天，等他来哄", score: 2 },
+      { text: "觉得天都塌了，他会不会不爱我了", score: 3 },
+    ],
+  },
+  {
+    text: "你哥穿了一件你觉得很丑的衣服，你？",
+    options: [
+      { text: "忽略，穿什么是他的自由", score: 0 },
+      { text: "委婉地给点建议", score: 1 },
+      { text: "强迫他换掉，不能毁形象", score: 2 },
+      { text: "直接帮他买好衣服，承包他的衣柜", score: 3 },
+    ],
+  },
+  {
+    text: "打游戏的时候你哥选了辅助来保护你，你心里？",
+    options: [
+      { text: "正常操作，游戏而已", score: 0 },
+      { text: "有点开心，被保护的感觉不错", score: 1 },
+      { text: "超幸福，果然我哥最疼我", score: 2 },
+      { text: "截图保存，挂在所有社交平台上炫耀", score: 3 },
+    ],
+  },
+  {
+    text: "你生病了，你哥说要照顾你，你？",
+    options: [
+      { text: "不用麻烦，我自己能行", score: 0 },
+      { text: "接受他的好意，有他照顾挺好的", score: 1 },
+      { text: "本来不严重但故意装得更严重想多留他一会儿", score: 2 },
+      { text: "希望一直生病他就能一直照顾我了", score: 3 },
+    ],
+  },
+  {
+    text: "你哥跟你分享他的烦恼时，你？",
+    options: [
+      { text: "正常倾听，给点建议", score: 0 },
+      { text: "认真开导他", score: 1 },
+      { text: "比他更焦虑，想帮他解决一切问题", score: 2 },
+      { text: "觉得他好可怜想把他抱在怀里安慰", score: 3 },
+    ],
+  },
+  {
+    text: "你哥给你介绍了一个男生，说是你的理想型，你？",
+    options: [
+      { text: "有兴趣地去了解看看", score: 0 },
+      { text: "礼貌接触一下", score: 1 },
+      { text: "心里嘀咕「我理想的类型就是你这样的」", score: 2 },
+      { text: "直接拒绝，除了你哥谁都不要", score: 3 },
+    ],
+  },
+  {
+    text: "爸妈说「你们兄妹感情真好」，你心里的想法？",
+    options: [
+      { text: "谢谢夸奖", score: 0 },
+      { text: "确实挺好的", score: 1 },
+      { text: "「兄妹」两个字有点刺耳", score: 2 },
+      { text: "我们不只是兄妹…", score: 3 },
+    ],
+  },
+  {
+    text: "你哥出差一个星期没联系你，你？",
+    options: [
+      { text: "很正常，出差本来就忙", score: 0 },
+      { text: "偶尔想起来会发个消息", score: 1 },
+      { text: "每天都在想他在干什么，要不要主动联系", score: 2 },
+      { text: "度日如年，每天翻他的社交动态八百遍", score: 3 },
+    ],
+  },
+  {
+    text: "你哥夸你「今天的打扮很好看」，你的反应？",
+    options: [
+      { text: "随便说声谢谢", score: 0 },
+      { text: "心里有点高兴", score: 1 },
+      { text: "开心一整天，反复回味这句话", score: 2 },
+      { text: "以后每天都这样穿，只为再听到他的夸奖", score: 3 },
+    ],
+  },
+  {
+    text: "你哥喝醉了打电话给你，你？",
+    options: [
+      { text: "让他早点休息，挂电话", score: 0 },
+      { text: "陪他聊一会儿", score: 1 },
+      { text: "马上去找他，路上买好醒酒药", score: 2 },
+      { text: "觉得喝醉的他好可爱，偷偷录音", score: 3 },
+    ],
+  },
+  {
+    text: "你哥说「要不以后我们一起住吧」，你？",
+    options: [
+      { text: "考虑一下，不一定方便", score: 0 },
+      { text: "觉得可以考虑", score: 1 },
+      { text: "立刻答应，开始规划未来", score: 2 },
+      { text: "兴奋得睡不着，连以后养什么宠物都想好了", score: 3 },
+    ],
+  },
+  {
+    text: "发现你哥手机壁纸是别的女生，你？",
+    options: [
+      { text: "那是他的自由", score: 0 },
+      { text: "好奇问一下是谁", score: 1 },
+      { text: "想办法让他换成别的", score: 2 },
+      { text: "趁他不注意偷偷换成你们的合照", score: 3 },
+    ],
+  },
+  {
+    text: "如果有人要你用一个词定义你和你哥的关系，你会选？",
+    options: [
+      { text: "家人", score: 0 },
+      { text: "好兄妹", score: 1 },
+      { text: "不可或缺的存在", score: 2 },
+      { text: "命中注定", score: 3 },
+    ],
+  },
+];
+
+const results = [
+  {
+    title: "钢铁直妹",
+    emoji: "🦾",
+    description: "你对你哥主打一个理性客观，该怼就怼、该嫌弃就嫌弃。兄控？不存在的，你甚至怀疑那些整天「我哥好帅」的人是不是有什么大病。你们的关系健康得像教科书里的兄妹关系。",
+    minScore: 0,
+    maxScore: 25,
+    color: "#10b981",
+  },
+  {
+    title: "轻度兄控",
+    emoji: "🌸",
+    description: "你承认你哥确实挺好的，偶尔也会在心里小小骄傲一下「我哥还挺帅的嘛」。但也就这样了——你依然有自己的生活，不会围着他转。属于那种正常范围内的兄妹情。",
+    minScore: 26,
+    maxScore: 45,
+    color: "#3b82f6",
+  },
+  {
+    title: "中度兄控",
+    emoji: "🔥",
+    description: "你已经开始意识到事情不太对了。你会吃他身边女生的醋，会收藏他发你的每一条语音，会在他不回消息的时候胡思乱想。你嘴上说「只是兄妹感情好」，但心里清楚没那么简单。",
+    minScore: 46,
+    maxScore: 65,
+    color: "#f59e0b",
+  },
+  {
+    title: "重度兄控",
+    emoji: "💀",
+    description: "已经没救了。你的世界以你哥为圆心画圆，半径约等于他走到哪你跟到哪。你手机的相册里他的照片比你自己还多，你对每一个试图接近他的异性都抱有一种说不清的敌意。别挣扎了，接受现实吧。",
+    minScore: 66,
+    maxScore: 80,
+    color: "#f97316",
+  },
+  {
+    title: "终极兄控",
+    emoji: "👑",
+    description: "恭喜，你已经达到了兄控的终极形态。在你的世界里，哥哥就是光、是电、是唯一的神话。你甚至已经在脑子里和你哥过完了一生。这个测试对你来说只是确认了一个你早就知道的事实。",
+    minScore: 81,
+    maxScore: 100,
+    color: "#ef4444",
+  },
+];
+---
+
+<MainGridLayout title={quizTitle} description={quizDescription}>
+  <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+    <div class="card-base z-10 px-9 py-6 relative w-full">
+      <QuizApp
+        quizTitle={quizTitle}
+        quizDescription={quizDescription}
+        scoreLabel="兄控指数"
+        questions={questions}
+        results={results}
+        client:load
+      />
+    </div>
+  </div>
+</MainGridLayout>
